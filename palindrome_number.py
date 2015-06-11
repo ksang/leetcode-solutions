@@ -17,7 +17,6 @@ class Solution:
         for i in range(1, n/2+1):
             c1 = (x % pow(10,i))/pow(10,i-1)
             c2 = (x/pow(10,n-i)) % 10
-            print "c1:%s, c2:%s" % (c1,c2)
             if c1 != c2:
                 return False
         return True
