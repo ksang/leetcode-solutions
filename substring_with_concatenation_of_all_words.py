@@ -6,43 +6,46 @@ class Solution:
         if len(words) < 1 or len(s) == 0:
             return []
         wdict = {}
-        for idx,w in enumerate(words):
+        for w in words:
             if wdict.has_key(w):
                 wdict[w] += 1
             else: wdict[w] = 1
-        print wdict
         res = []
         size = len(words[0])
         i = 0
-        while i <= len(s)-size*len(words):
-            rflag = True
-            tdict = wdict.copy()
-            j = i
-            while j < i+size*len(words):
+        # starting posistion has 0 - size-1 possibilies
+        for i in range(0,size):
+            j = left = i
+            count = 0 # counter for word match
+            tdict = {}
+            while j <= len(s)-size:
                 key = s[j:j+size]
-                if tdict.has_key(key):
-                    if tdict[key] >= 1:
-                        tdict[key] -= 1
-                        j += size
+                if wdict.has_key(key):
+                    if tdict.has_key(key):
+                        tdict[key] += 1
+                    else: tdict[key] = 1
+                    if tdict[key] <= wdict[key]:
+                        count += 1
                     else:
-                        i += 1
-                        rflag = False
-                        break
+                        # more word than in the word dict, move substring from left
+                        while tdict[key] > wdict[key]:
+                            ss = s[left:left+size]
+                            tdict[ss] -= 1
+                            if tdict[ss] < wdict[ss]: count -= 1
+                            left += size
+                    if count == len(words):
+                        res.append(left)
+                        tdict[s[left:left+size]] -= 1
+                        count -= 1
+                        left += size
                 else:
-                    i += 1
-                    rflag = False
-                    break
-            if rflag == True:
-                for item in tdict.values():
-                    if item != 0:
-                        rflag = False
-                        i += 1
-                        break
-            if rflag == True:
-                res.append(i)
-                i += 1
+                    # not a valid word, reset vars, move left to current pos
+                    tdict.clear()
+                    count = 0
+                    left = j+size
+                j += size
 
         return res
 
 if __name__ == '__main__':
-    print Solution().findSubstring("abaababbaba", ["ab","ba","ab","ba"])
+    print Solution().findSubstring("barfoofoobarthefoobarman", ["bar","foo","the"])
