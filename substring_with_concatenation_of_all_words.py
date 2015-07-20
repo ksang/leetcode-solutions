@@ -5,50 +5,44 @@ class Solution:
     def findSubstring(self, s, words):
         if len(words) < 1 or len(s) == 0:
             return []
-        key = words[0]
+        wdict = {}
+        for idx,w in enumerate(words):
+            if wdict.has_key(w):
+                wdict[w] += 1
+            else: wdict[w] = 1
+        print wdict
         res = []
-        size = len(key)
-        i = pos = 0
-        while pos >= 0:
-            pos = s[i:].find(key)
-            right = pos+i+size
-            left = pos+i-size
-            tl = []
-            while right <= len(s)-size:
-                temp = s[right:right+size]
-                if temp in words[1:] and temp not in tl:
-                    tl.append(temp)
-                else: break
-                right += size
-            while left >= 0:
-                temp = s[left:left+size]
-                if temp in words[1:] and temp not in tl:
-                    tl.append(temp)
-                else: break
-                left -= size
-            if len(tl) == len(words)-1:
-                res.append(left+size)  
-            right = pos+i+size
-            left = pos+i-size
-            tl = []
-            while left >= 0:
-                temp = s[left:left+size]
-                if temp in words[1:] and temp not in tl:
-                    tl.append(temp)
-                else: break
-                left -= size
-            while right <= len(s)-size:
-                temp = s[right:right+size]
-                if temp in words[1:] and temp not in tl:
-                    tl.append(temp)
-                else: break
-                right += size
-            if len(tl) == len(words)-1:
-                if res[-1] != left+size:
-                    res.append(left+size)  
-            # move to the next find
-            i = i+pos+size
+        size = len(words[0])
+        i = 0
+        while i <= len(s)-size*len(words):
+            rflag = True
+            tdict = wdict.copy()
+            j = i
+            while j < i+size*len(words):
+                key = s[j:j+size]
+                if tdict.has_key(key):
+                    if tdict[key] >= 1:
+                        tdict[key] -= 1
+                        j += size
+                    else:
+                        i += 1
+                        rflag = False
+                        break
+                else:
+                    i += 1
+                    rflag = False
+                    break
+            if rflag == True:
+                for item in tdict.values():
+                    if item != 0:
+                        rflag = False
+                        i += 1
+                        break
+            if rflag == True:
+                res.append(i)
+                i += 1
+
         return res
 
 if __name__ == '__main__':
-    print Solution().findSubstring("barfoofoobarthefoobarman", ["bar","foo","the"])
+    print Solution().findSubstring("abaababbaba", ["ab","ba","ab","ba"])
