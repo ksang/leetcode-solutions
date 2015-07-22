@@ -1,7 +1,7 @@
 import re
 
 class Node:
-    
+
     __slots__ = ['key','value','prev','next']
 
     def __init__(self, key, value):
@@ -50,7 +50,6 @@ class LRUCache:
         saved_key = saved_tail.key
         self.tail = saved_tail.prev
         self.tail.next = None
-        del saved_tail
         self.mapping.pop(saved_key)
         self.size -= 1
 
