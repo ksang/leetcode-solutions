@@ -1,6 +1,9 @@
 import re
 
 class Node:
+    
+    __slots__ = ['key','value','prev','next']
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -20,6 +23,10 @@ class LRUCache:
         saved_head = self.head
         self.head = node
         node.prev = None
+        if saved_head is None:
+            # first node
+            self.tail = node
+            return
         node.next = saved_head
         saved_head.prev = node        
 
@@ -27,13 +34,13 @@ class LRUCache:
         # node is already the head
         if node.prev is None: 
             return
-        # link node's neighbors
-        node.prev.next = node.next
-        if node.next is not None:
-            node.next.prev = node.prev
-        else:
+        # link node's neighbors        
+        if node.next is None:
             # tail was this node, moving it will cause tail change.
             self.tail = node.prev
+        else:
+            node.next.prev = node.prev
+        node.prev.next = node.next
         self.__insert_to_head(node)
 
     def __cut_tail(self):
@@ -44,11 +51,13 @@ class LRUCache:
         self.tail = saved_tail.prev
         self.tail.next = None
         del saved_tail
-        del self.mapping[saved_key]
+        self.mapping.pop(saved_key)
+        self.size -= 1
 
-    def __competitor_joined(self, key, value):
+    def __add_new(self, key, value):
         node = Node(key, value)
         self.__insert_to_head(node)
+        self.mapping[key] = node
         self.size += 1
         if self.size > self.capacity:
             self.__cut_tail()
@@ -66,12 +75,12 @@ class LRUCache:
     # @param value, an integer
     # @return nothing
     def set(self, key, value):
-        if self.mapping.has_key(key):
-            node = self.mapping(key)
+        node = self.mapping.get(key)
+        if node is not None:
             node.value = value
             self.__move_to_head(node)
         else:
-            self.__competitor_joined(key, value)
+            self.__add_new(key, value)
 
 # Parse the input method string
 def parse(string):
@@ -95,5 +104,7 @@ if __name__ == '__main__':
         m = getattr(cache,method[0])
         print method
         if type(method[1]) is int:
-            m(method[1])
+            print 'Get result: %s' % m(method[1])
         else: m(method[1][0], method[1][1])
+        print cache.mapping
+        print "size: %s, capacity: %s" % (cache.size, cache.capacity)
