@@ -27,6 +27,8 @@ class Solution:
                     for j in range(0,col):
                         if ct.get((row,j)) == item:
                             return False
+                    for i in range(row/3,row):
+                        for j in range(col/3,col/3+3)
                     ct[(row,col)] = item
         return True
 
