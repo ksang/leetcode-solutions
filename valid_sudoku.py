@@ -1,14 +1,14 @@
 BOARD = [
-    ['5','3','.','.','7','.','.','.','.'],
-    ['6','.','.','1','9','5','.','.','.'],
-    ['.','9','8','.','.','.','.','6','.'],
-    ['8','.','.','.','6','.','.','.','3'],
-    ['4','.','.','8','.','3','.','.','1'],
-    ['7','.','.','.','2','.','.','.','6'],
-    ['.','6','.','.','.','.','2','8','.'],
-    ['.','.','.','4','1','9','.','.','5'],
-    ['.','.','.','.','8','.','7','7','9']
-]
+            "..5.....6",
+            "....14...",
+            ".........",
+            ".....92..",
+            "5....2...",
+            ".......3.",
+            "...54....",
+            "3.....42.",
+            "...27.6.."
+        ]
 
 class Solution:
     # @param {character[][]} board
@@ -27,12 +27,14 @@ class Solution:
                     for j in range(0,col):
                         if ct.get((row,j)) == item:
                             return False
-                    for i in range(row/3,row):
-                        for j in range(col/3,col/3+3)
+                    for i in range(row/3*3,row):
+                        for j in range(col/3*3,col/3*3+3):
+                            #print "i:%s, j:%s, row:%s, col:%s " % (i,j,row,col)
+                            if ct.get((i,j)) == item:
+                                #print 'sub box check failed'
+                                return False
                     ct[(row,col)] = item
         return True
-
-        
 
 if __name__ == '__main__':
     print Solution().isValidSudoku(BOARD)
