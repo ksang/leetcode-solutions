@@ -1,61 +1,38 @@
-from math import floor
-from math import ceil
+items_per_column = 15
 
 def swap(i, j, nums):
-	buf = nums[j]
-	nums[j] = nums[i]
-	nums[i] = buf
+    nums[i], nums[j] = nums[j], nums[i]
 
-# group list to two parts, greater than / less than nums[pivotIndex]
-def partition(nums, left, right, pivotIndex):
-	pivotValue = nums[pivotIndex]
-	swap(pivotIndex, right, nums)
-	storeIndex = left
-	for i in range(left, right):
-		if nums[i] < pivotValue:
-			swap(storeIndex, i, nums)
-			storeIndex += 1
-	# move pivot to it's final place
-	swap(right, storeIndex, nums)
-	return storeIndex
+def find_i_th_smallest( A, i ):
+    t = len(A)
+    if(t <= items_per_column):
+        # if A is a small list with less than items_per_column items, then:
+        #     1. do sort on A
+        #     2. return the i-th smallest item of A
+        #
+        return sorted(A)[i]
+    else:
+        # 1. partition A into columns of items_per_column items each. items_per_column is odd, say 15.
+        # 2. find the median of every column
+        # 3. put all medians in a new list, say, B
+        #
+        B = [ find_i_th_smallest(k, (len(k) - 1)/2) for k in [A[j:(j + items_per_column)] for j in range(0,len(A),items_per_column)]]
 
-# implement with insertion sort
-def partition5(nums, left, right):
-	buf = []
-	for i in range(left, right+1):
-		buf.append((nums[i], i))
-	for i in range(0, len(buf)):
-		j = i
-		while j > 0 and buf[j][0] < buf[j-1][0]:
-			swap(j-1, j, buf)
-			j -= 1
-	return buf[len(buf)/2][1]
+        # 4. find M, the median of B
+        #
+        M = find_i_th_smallest(B, (len(B) - 1)/2)
 
-def pivot(nums, left, right):
-	if right - left < 5:
-		return partition5(nums, left, right)
-	i = left
-	while i < right:
-		subRight = i + 4
-		if subRight > right:
-			subRight = right
-		median5 = partition5(nums, i, subRight)
-		swap(median5, int(left + floor((i - left)/5)), nums)
-		i += 5
-	return select(nums, left, int(left + ceil((right - left)/5) - 1), left + (right - left)/10)
-
-def select(nums, left, right, n):
-	if left == right:
-		return left
-	while True:
-		pivotIndex = pivot(nums, left, right)
-		pivotIndex = partition(nums, left, right, pivotIndex)
-		if n == pivotIndex:
-			return n
-		elif n < pivotIndex:
-			right = pivotIndex - 1
-		else:
-			left = pivotIndex + 1
+        # 5. split A into 3 parts by M, { < M }, { == M }, and { > M }
+        # 6. find which above set has A's i-th smallest, recursively.
+        #
+        P1 = [ j for j in A if j < M ]
+        if(i < len(P1)):
+            return find_i_th_smallest( P1, i)
+        P3 = [ j for j in A if j > M ]
+        L3 = len(P3)
+        if(i < (t - L3)):
+            return M
+        return find_i_th_smallest( P3, i - (t - L3))
 
 class Solution(object):
 	# vIndex: 1 3 5 7 9 0 2 4 6 8
@@ -70,10 +47,11 @@ class Solution(object):
 		self.n = len(nums)
 		if self.n <= 1:
 			return
-		median = nums[select(nums, 0, self.n-1, (self.n-1)/2)]
+		median = find_i_th_smallest(nums, (self.n-1)/2)
+		print median
 		i = j = 0
 		k = self.n-1
-		while j < k:
+		while j <= k:
 			if nums[self.vIndex(j)] > median:
 				swap(self.vIndex(i),self.vIndex(j),nums)
 				i += 1
@@ -86,7 +64,7 @@ class Solution(object):
 
 
 if __name__ == '__main__':
-	nums = [1,3,2,2,3,1]
+	nums = [1,5,1,1,6,4]
 	Solution().wiggleSort(nums)
 	print nums
 
