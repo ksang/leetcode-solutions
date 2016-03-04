@@ -7,20 +7,19 @@ class Solution(object):
         nodes = preorder.split(",")
         if len(nodes) % 2 == 0:
         	return False
+        if nodes[-1] != "#":
+        	return False
         if nodes[0] == "#":
-        	if len(nodes) == 1:
-        		return True
-        	else:
-        		return False
-        stack = ["root"]
-        for n in nodes:
-        	if n == "#":
+            return False
+        stack = [nodes[0]]
+        for i in range(1, len(nodes)-1):
+        	if nodes[i] == "#":
         		if stack:
         			stack.pop(-1)
         		else:
         			return False
         	else:
-        		stack.append(n)
+        		stack.append(nodes[i])
         if stack:
         	return False
         return True
