@@ -1,19 +1,24 @@
 class Solution(object):
-    def minDistance(self, word1, word2):
-        """
-        :type word1: str
-        :type word2: str
-        :rtype: int
-        """
-        dist = range(len(word2)+1)
-        for i in xrange(len(word1)):
-        	dist_ij = i
-        	dist[0] = i+1
-        	for j in xrange(len(word2)):
-        		if word1[i] == word2[j]:
-        			dist[j+1] = dist_ij
-        			dist_ij = dist[j+1]
-        		else:
-        			dist[j+1] = min(dist[j], dist_ij, dist[j+1]) + 1
+	def minDistance(self, word1, word2):
+		"""
+		:type word1: str
+		:type word2: str
+		:rtype: int
+		"""
+		m, n = len(word1), len(word2)
+		dp = [range(n+1)] + [[i] + n*[0] for i in xrange(1,m+1)]
+		for i in xrange(0, m):
+			for j in xrange(0, n):
+				if word1[i] == word2[j]:
+					# character matched no step required
+					dp[i+1][j+1] = dp[i][j]
+				else:
+					# insert	dp[i+1][j+1] = dp[i][j+1] + 1
+					# replace	dp[i+1][j+1] = dp[i][j] + 1
+					# delete 	dp[i+1][j+1] = dp[i+1][j] + 1
+					dp[i+1][j+1] = min(dp[i][j+1], dp[i+1][j], dp[i][j])+1
+		return dp[m][n]
 
-        			72/115
+if __name__ == '__main__':
+	print Solution().minDistance("charge", "exchange")
+	#72/115
